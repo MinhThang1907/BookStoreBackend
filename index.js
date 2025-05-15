@@ -8,6 +8,7 @@ dotenv.config();
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import bookRoutes from "./routes/book.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 // Generate a jwt secret key
 // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
   res.send({ status: "Started" });
 });
 app.use("/api/books", bookRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

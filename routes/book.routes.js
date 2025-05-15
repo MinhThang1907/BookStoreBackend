@@ -6,13 +6,14 @@ import {
   updateBook,
   deleteBook,
 } from "../controllers/book.controller.js";
+import { authenticateJWT } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 router.get("/", listBooks);
-router.post("/", createBook);
+router.post("/", authenticateJWT, createBook);
 router.get("/:bookId", getBookById);
-router.put("/:bookId", updateBook);
-router.delete("/:bookId", deleteBook);
+router.put("/:bookId", authenticateJWT, updateBook);
+router.delete("/:bookId", authenticateJWT, deleteBook);
 
 export default router;
