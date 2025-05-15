@@ -1,0 +1,209 @@
+tags:
+  - name: Books
+    description: Books management
+paths:
+  /api/books:
+    get:
+      summary: Retrieve a list of books
+      operationId: listBooks
+      tags:
+        - Books
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          description: Page number for pagination
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+      responses:
+        '200':
+          description: A paginated list of books
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookList'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Create a new book
+      operationId: createBook
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreate'
+      responses:
+        '201':
+          description: Book created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/books/{bookId}:
+    parameters:
+      - in: path
+        name: bookId
+        required: true
+        schema:
+          type: string
+        description: Unique identifier of the book
+    get:
+      summary: Get a single book by ID
+      operationId: getBookById
+      tags:
+        - Books
+      responses:
+        '200':
+          description: The requested book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Update an existing book
+      operationId: updateBook
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpdate'
+      responses:
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Delete a book by ID
+      operationId: deleteBook
+      tags:
+        - Books
+      responses:
+        '204':
+          description: Book deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "The Great Gatsby"
+        author:
+          type: string
+          example: "F. Scott Fitzgerald"
+        publishedDate:
+          type: string
+          format: date
+          example: "1925-04-10"
+        price:
+          type: number
+          format: float
+          example: 10.99
+        stock:
+          type: integer
+          example: 42
+      required:
+        - title
+        - author
+        - publishedDate
+        - price
+        - stock
+    BookCreate:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Book'
+      required:
+        - title
+        - author
+        - publishedDate
+        - price
+        - stock
+    BookUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        publishedDate:
+          type: string
+          format: date
+        price:
+          type: number
+          format: float
+        stock:
+          type: integer
+    BookList:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 500
+        message:
+          type: string
+          example: "An unexpected error occurred"
+      required:
+        - code
+        - message
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
