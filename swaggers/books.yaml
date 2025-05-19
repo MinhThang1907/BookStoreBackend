@@ -1,41 +1,43 @@
 tags:
   - name: Books
     description: Books management
+
 paths:
   /api/books:
     get:
-      summary: Retrieve a list of books
-      operationId: listBooks
       tags:
         - Books
+      summary: Retrieve a paginated list of books
+      operationId: listBooks
       parameters:
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
-          description: Page number for pagination
+          description: Page number (default 1)
         - in: query
           name: size
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Number of items per page
+          description: Items per page (default 10)
       responses:
         '200':
-          description: A paginated list of books
+          description: Paginated books list
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookList'
         '500':
           $ref: '#/components/responses/InternalError'
+
     post:
-      summary: Create a new book
-      operationId: createBook
       tags:
         - Books
+      summary: Create a new book
+      operationId: createBook
       security:
         - bearerAuth: []
       requestBody:
@@ -46,7 +48,7 @@ paths:
               $ref: '#/components/schemas/BookCreate'
       responses:
         '201':
-          description: Book created successfully
+          description: Book created
           content:
             application/json:
               schema:
@@ -55,6 +57,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+
   /api/books/{bookId}:
     parameters:
       - in: path
@@ -62,15 +65,16 @@ paths:
         required: true
         schema:
           type: string
-        description: Unique identifier of the book
+        description: MongoDB ObjectId of the book
+
     get:
-      summary: Get a single book by ID
-      operationId: getBookById
       tags:
         - Books
+      summary: Get a single book by ID
+      operationId: getBookById
       responses:
         '200':
-          description: The requested book
+          description: Book found
           content:
             application/json:
               schema:
@@ -79,11 +83,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+
     put:
-      summary: Update an existing book
-      operationId: updateBook
       tags:
         - Books
+      summary: Update an existing book
+      operationId: updateBook
       security:
         - bearerAuth: []
       requestBody:
@@ -94,7 +99,7 @@ paths:
               $ref: '#/components/schemas/BookUpdate'
       responses:
         '200':
-          description: Book updated successfully
+          description: Book updated
           content:
             application/json:
               schema:
@@ -105,98 +110,192 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+
     delete:
-      summary: Delete a book by ID
-      operationId: deleteBook
       tags:
         - Books
+      summary: Delete a book
+      operationId: deleteBook
       security:
         - bearerAuth: []
       responses:
         '204':
-          description: Book deleted successfully
+          description: Book deleted
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+
 components:
   schemas:
     Book:
       type: object
       properties:
-        title:
+        _id:
           type: string
-          example: "The Great Gatsby"
-        author:
+          example: "60df6f9e3b1e8a0015f4c123"
+        bookName:
           type: string
-          example: "F. Scott Fitzgerald"
-        publishedDate:
+          description: Tên sách
+          example: "Lập trình Javascript"
+        bookCover:
           type: string
-          format: date
-          example: "1925-04-10"
-        price:
+          description: URL hoặc filename của ảnh bìa
+          example: "https://example.com/covers/js.png"
+        rating:
           type: number
           format: float
-          example: 10.99
-        stock:
+          description: Đánh giá
+          example: 4.5
+        language:
+          type: string
+          description: Ngôn ngữ sách
+          example: "Eng"
+        pageNo:
           type: integer
-          example: 42
-      required:
-        - title
-        - author
-        - publishedDate
-        - price
-        - stock
+          description: Số trang
+          example: 320
+        author:
+          type: string
+          description: Tác giả
+          example: "Douglas Crockford"
+        genre:
+          type: array
+          items:
+            type: string
+          description: Thể loại
+          example: ["Programming", "Web"]
+        readed:
+          type: string
+          description: Lượt đọc (e.g. "12k")
+          example: "5k"
+        description:
+          type: string
+          description: Mô tả sách
+          example: "Cuốn sách hướng dẫn..."
+        backgroundColor:
+          type: string
+          description: Màu nền hiển thị
+          example: "#FFFFFF"
+        navTintColor:
+          type: string
+          description: Màu tint thanh điều hướng
+          example: "#000000"
+        isBookMark:
+          type: boolean
+          description: Đánh dấu bookmark
+          example: true
+        categories:
+          type: array
+          items:
+            type: string
+          description: Các category bổ sung
+          example: ["Frontend", "ES6"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
     BookCreate:
       type: object
-      allOf:
-        - $ref: '#/components/schemas/Book'
+      properties:
+        bookName:
+          $ref: '#/components/schemas/Book/properties/bookName'
+        bookCover:
+          $ref: '#/components/schemas/Book/properties/bookCover'
+        rating:
+          $ref: '#/components/schemas/Book/properties/rating'
+        language:
+          $ref: '#/components/schemas/Book/properties/language'
+        pageNo:
+          $ref: '#/components/schemas/Book/properties/pageNo'
+        author:
+          $ref: '#/components/schemas/Book/properties/author'
+        genre:
+          $ref: '#/components/schemas/Book/properties/genre'
+        readed:
+          $ref: '#/components/schemas/Book/properties/readed'
+        description:
+          $ref: '#/components/schemas/Book/properties/description'
+        backgroundColor:
+          $ref: '#/components/schemas/Book/properties/backgroundColor'
+        navTintColor:
+          $ref: '#/components/schemas/Book/properties/navTintColor'
+        isBookMark:
+          $ref: '#/components/schemas/Book/properties/isBookMark'
+        categories:
+          $ref: '#/components/schemas/Book/properties/categories'
       required:
-        - title
-        - author
-        - publishedDate
-        - price
-        - stock
+        - bookName
+        - bookCover
+
     BookUpdate:
       type: object
       properties:
-        title:
+        bookName:
           type: string
+        bookCover:
+          type: string
+        rating:
+          type: number
+        language:
+          type: string
+        pageNo:
+          type: integer
         author:
           type: string
-        publishedDate:
+        genre:
+          type: array
+          items:
+            type: string
+        readed:
           type: string
-          format: date
-        price:
-          type: number
-          format: float
-        stock:
-          type: integer
+        description:
+          type: string
+        backgroundColor:
+          type: string
+        navTintColor:
+          type: string
+        isBookMark:
+          type: boolean
+        categories:
+          type: array
+          items:
+            type: string
+
     BookList:
       type: object
       properties:
         total:
           type: integer
           example: 100
+        page:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 10
         items:
           type: array
           items:
             $ref: '#/components/schemas/Book'
+
     Error:
       type: object
       properties:
         code:
           type: integer
-          example: 500
         message:
           type: string
-          example: "An unexpected error occurred"
       required:
         - code
         - message
+
   responses:
     BadRequest:
-      description: Invalid request parameters
+      description: Invalid request
       content:
         application/json:
           schema:
@@ -213,10 +312,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
 security:
   - bearerAuth: []

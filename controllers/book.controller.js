@@ -46,10 +46,10 @@ export const listBooks = async (req, res) => {
 export const createBook = async (req, res) => {
   try {
     const book = new Book(req.body);
-    const resBook = await getBookImage(book.bookName);
+    // const resBook = await getBookImage(book.bookName);
 
-    const buffer = await resBook.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString("base64");
+    // const buffer = await resBook.arrayBuffer();
+    // const base64 = Buffer.from(buffer).toString("base64");
 
     // const base64data = await new Promise((resolve, reject) => {
     //   const reader = new FileReader();
@@ -58,7 +58,7 @@ export const createBook = async (req, res) => {
     //   reader.readAsDataURL(blob);
     // });
 
-    book.bookCover = base64;
+    book.bookCover = "";
 
     const saved = await book.save();
     res.status(201).json(saved);
