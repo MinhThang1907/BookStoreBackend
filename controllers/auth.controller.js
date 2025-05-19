@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
+  console.log(username, password)
   const user = await User.findOne({ username });
   if (!user) return res.status(404).json({ message: "User not found" });
   const valid = await bcrypt.compare(password, user.password);
@@ -11,7 +12,7 @@ export const login = async (req, res) => {
   const token = jwt.sign({ id: user._id, username }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  res.json({ token });
+  res.status(500).json({ token, ...user.toObject() });
 };
 
 export const register = async (req, res) => {

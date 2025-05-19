@@ -11,6 +11,7 @@ import bookRoutes from "./routes/book.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 // Generate a jwt secret key
 // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+import cors from "cors"
 
 mongoose
   .connect(process.env.MONGO_URL)
@@ -33,6 +34,13 @@ const swaggerJsDocOptions = {
   apis: ["./swaggers/*.yaml"],
 };
 const apiSpec = swaggerJsDoc(swaggerJsDocOptions);
+
+app.use(cors({
+  origin: '*'
+}));
+
+app.use(express.json()); // 👈 Thêm dòng này
+
 app.get("/swagger.json", (_req, res) => res.json(apiSpec));
 app.use(
   "/swagger",
